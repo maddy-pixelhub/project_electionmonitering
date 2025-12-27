@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Election Monitoring</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",sans-serif}
+body{background:#f5f5f5;overflow:hidden;transition: background 0.3s,color 0.3s}
+body.dark{background:#121212;color:white}
+
+/* MAIN GRID */
+.box{
+display:grid;height:100vh;width:100%;
+grid-template-rows:20% 70% 10%;
+grid-template-columns:20% 10% 50% 20%;
+background:linear-gradient(orange,white,rgb(248, 202, 33),white);
+animation:fadeIn 0.8s ease-in-out;
+}
+
+/* HEADER */
+.heading{
+grid-row:1/2;grid-column:1/5;
+background:linear-gradient(orange,white,green);
+display:flex;flex-direction:column;
+justify-content:center;align-items:center;
+gap:5px;
+box-shadow:0 3px 10px rgba(0,0,0,0.3);
+animation:slideDown 0.8s ease;
+}
+.heading button{
+padding:5px 12px;border:none;border-radius:20px;
+cursor:pointer;font-size:13px;
+}
+
+/* SIDEBAR */
+.sidemenu{
+grid-row:2/4;grid-column:1/2;
+background:linear-gradient(dodgerblue,#83bcc8);
+display:flex;flex-direction:column;
+justify-content:center;align-items:center;
+gap:10px;
+border-top-right-radius:250px;
+border-bottom-right-radius:250px;
+box-shadow:2px 0 15px rgba(0,0,0,0.4);
+animation:slideLeft 0.8s ease;
+overflow: hidden;
+}
+.sidemenu button{
+width:100%;height:40px;
+border:none;cursor:pointer;
+font-weight:bold;border-radius:10px;
+background:linear-gradient(to right,#209cd5,#4b999d,white);
+transition:transform 0.2s,box-shadow 0.2s;
+}
+.sidemenu button:hover{
+transform:scale(1.08);
+box-shadow:0 0 10px rgba(255,255,255,0.9);
+}
+
+/* BODY */
+.bodymain{
+grid-row:2/4;grid-column:2/4;
+padding:10px;
+overflow:auto;
+place-content: center;
+}
+
+/* HOME BOXES */
+.home-boxes{
+display:flex;justify-content:center;
+align-items:center;flex-wrap:wrap;
+gap:20px;
+}
+.mainbox{
+width:200px;height:200px;
+background:white;
+display:flex;flex-direction:column;
+align-items:center;justify-content:center;
+cursor:pointer;
+box-shadow:0 0 10px rgba(0,0,0,0.3);
+border-radius:18px;
+transition:transform 0.25s,box-shadow 0.25s;
+animation:scaleIn 0.6s ease;
+}
+.mainbox:hover{
+transform:translateY(-6px) scale(1.03);
+box-shadow:0 10px 20px rgba(0,0,0,0.4);
+}
+
+/* NEWS */
+.news{
+grid-row:2/4;grid-column:4/5;
+background:linear-gradient(to bottom,#58aecd,#3593a5);
+color:white;
+padding:15px;
+display:flex;flex-direction:column;
+gap:10px;
+animation:slideRight 0.8s ease;
+}
+.news h3{text-shadow:1px 1px 3px black}
+.news small{opacity:0.9;font-size:12px}
+.news button{
+border:none;padding:5px 10px;border-radius:10px;
+cursor:pointer;font-size:12px;
+}
+
+/* FOOTER */
+.foot{
+grid-row:4/5;grid-column:1/5;
+background:#e3c088;
+display:flex;justify-content:center;align-items:center;
+animation:slideUp 0.8s ease;
+}
+
+/* SECTIONS */
+section{display:none;animation:fadeInUp 0.4s ease}
+section.active{display:block}
+
+/* FORM ELEMENTS */
+input,select,textarea,button{
+padding:8px;width:100%;margin:5px 0;
+border-radius:6px;border:1px solid #aaa;font-size:14px;
+}
+button.action{
+background:#0077b6;color:white;border:none;cursor:pointer;
+}
+button.action:hover{opacity:0.9}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;margin-top:10px;background:white}
+td,th{border:1px solid black;padding:6px;font-size:13px;text-align:center}
+
+/* CANVAS */
+canvas{background:white;margin-top:20px;border-radius:8px;box-shadow:0 0 8px rgba(0,0,0,0.25)}
+
+/* REPORT IMAGE PREVIEW */
+#reportPreview{
+max-width:100%;max-height:150px;margin-top:5px;border-radius:8px;display:none;
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideDown{from{transform:translateY(-40px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes slideLeft{from{transform:translateX(-80px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideRight{from{transform:translateX(80px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fadeInUp{from{transform:translateY(15px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes scaleIn{from{transform:scale(0.7);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* MOBILE */
+@media(max-width:900px){
+.box{
+grid-template-columns:100%;
+grid-template-rows:auto auto 1fr auto;
+height:auto;
+background-size:55%;
+}
+.sidemenu{
+flex-direction:row;
+grid-row:2/3;grid-column:1/5;
+border-radius:0;padding:10px;
+}
+.sidemenu button{height:auto;font-size:12px;padding:6px 8px}
+.bodymain{grid-row:3/4;grid-column:1/5}
+.news{grid-row:4/5;grid-column:1/5}
+.foot{grid-row:5/6;grid-column:1/5}
+}
+.heading{
+    grid-row:1/2;
+    grid-column:1/5;
+    background:linear-gradient(90deg,orange,white,green);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 20px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.3);
+}
+
+.header-left{
+    display:flex;
+    flex-direction:column;
+}
+
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.admin-btn{
+    padding:6px 14px;
+    border:none;
+    border-radius:20px;
+    cursor:pointer;
+    font-size:13px;
+    font-weight:600;
+    background:#111;
+    color:white;
+}
+
+body.dark .admin-btn{
+    background:#eee;
+    color:black;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<!-- HEADER -->
+<div class="heading">
+    <div class="header-left">
+        <h1>Election Monitoring</h1>
+        <p>---------- Government of India ---------- </p>
+    </div>
+
+    <div class="header-right">
+        <button class="dark-toggle" onclick="toggleDark()">🌙</button>
+        <button class="admin-btn" onclick="showPage('admin')">Admin Login</button>
+    </div>
+</div>
+
+
+<!-- SIDEBAR -->
+<div class="sidemenu">
+  <button onclick="showPage('home')">Home</button>
+  <button onclick="showPage('candidates')">Candidates</button>
+  <button onclick="showPage('monitor')">Monitor</button>
+  <button onclick="showPage('results')">View Results</button>
+  <button onclick="showPage('report')">Report</button>
+  
+  <button onclick="showPage('about')">About</button>
+</div>
+
+<!-- MAIN BODY -->
+<div class="bodymain">
+
+  <!-- HOME -->
+  <section id="home" class="active">
+    <div class="home-boxes">
+      <div class="mainbox" onclick="showPage('candidates')"><h3>Candidates</h3></div>
+      <div class="mainbox" onclick="showPage('monitor')"><h3>Monitor</h3></div>
+      <div class="mainbox" onclick="showPage('results')"><h3>Results</h3></div>
+    </div>
+  </section>
+
+  <!-- CANDIDATES -->
+  <section id="candidates">
+    <h3>Candidate Registration</h3>
+    <input id="cname" placeholder="Candidate Name">
+    <input id="cparty" placeholder="Party Name">
+    <input id="cconst" placeholder="Constituency">
+    <button class="action" onclick="addCandidate()">Add Candidate</button>
+
+    <h3>Candidate List</h3>
+    <table id="candTable"></table>
+  </section>
+
+  <!-- MONITOR -->
+  <section id="monitor">
+    <h3>Live Booth Monitoring</h3>
+    <table id="monitorTable">
+      <tr><th>Booth</th><th>City</th><th>Voting %</th></tr>
+      <tr><td>101</td><td>Delhi</td><td class="vote">45</td></tr>
+      <tr><td>102</td><td>Hyderabad</td><td class="vote">60</td></tr>
+      <tr><td>103</td><td>Mumbai</td><td class="vote">32</td></tr>
+    </table>
+    <p style="font-size:12px;opacity:0.8;margin-top:5px;">(Voting % auto-updates to simulate live data)</p>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="results">
+    <h3>Election Results</h3>
+    <table>
+      <tr><th>Constituency</th><th>Candidate</th><th>Party</th><th>Votes</th></tr>
+      <tr><td>Delhi</td><td>Sita</td><td>INC</td><td>45200</td></tr>
+      <tr><td>Hyderabad</td><td>Ravi</td><td>BJP</td><td>50100</td></tr>
+      <tr><td>Mumbai</td><td>Arjun</td><td>AAP</td><td>38900</td></tr>
+    </table>
+
+    <canvas id="chart" width="300" height="200"></canvas>
+    <p style="font-size:12px;opacity:0.8;">Bar graph created using Canvas and JavaScript.</p>
+  </section>
+
+  <!-- REPORT -->
+  <section id="report">
+    <h3>Submit Complaint</h3>
+    <input id="rname" placeholder="Your Name">
+    <input id="rbooth" placeholder="Booth Number">
+    <select id="rtype">
+      <option value="EVM Issue">EVM Issue</option>
+      <option value="Violence">Violence</option>
+      <option value="Missing Name">Missing Name</option>
+    </select>
+    <textarea id="rdesc" placeholder="Describe issue"></textarea>
+    <input type="file" id="rimage" accept="image/*">
+    <img id="reportPreview" alt="Preview">
+
+    <button class="action" onclick="saveReport()">Submit Complaint</button>
+    <button onclick="downloadReport()">Download Complaints Report</button>
+
+    <h4>Saved Complaints</h4>
+    <ul id="reportList"></ul>
+  </section>
+
+  <!-- ADMIN -->
+  <section id="admin">
+    <h3>Admin Login</h3>
+    <input id="auser" placeholder="Username">
+    <input id="apass" type="password" placeholder="Password">
+    <button class="action" onclick="login()">Login</button>
+    <p id="loginMsg" style="margin-top:5px;"></p>
+
+    <div id="adminDash" style="display:none;margin-top:10px;">
+      <h4>Admin Dashboard</h4>
+      <ul>
+        <li>Manage Candidates</li>
+        <li>Monitor Booths</li>
+        <li>Review Results</li>
+        <li>View Complaints</li>
+      </ul>
+      <p style="font-size:11px;opacity:0.8;margin-top:5px;">
+        (For real database connection, this section can call backend APIs like <code>/api/candidates</code>, <code>/api/results</code> etc.)
+      </p>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <h3>About This Project</h3>
+    <p>
+      This Election Monitoring System simulates a digital election control panel for:
+      candidate management, live monitoring, results, complaints and admin control.
+    </p>
+    <h4>Features</h4>
+    <ul>
+      <li>Candidates stored using <code>localStorage</code> (acts as a mini database).</li>
+      <li>Live-style booth monitoring with auto-updating percentages.</li>
+      <li>Result graph using HTML5 Canvas.</li>
+      <li>Complaint system with image preview and downloadable report.</li>
+      <li>Admin login with front-end validation.</li>
+      <li>Dark / Light mode and mobile responsive design.</li>
+      <li>Optional live news using a public news API.</li>
+    </ul>
+  </section>
+
+</div>
+
+<!-- NEWS -->
+<div class="news">
+  <h3>LIVE NEWS</h3>
+  <p id="newsText">Loading news...</p>
+  <small id="newsTime"></small>
+  <button onclick="fetchLiveNews()">Refresh from API</button>
+  <small>(Uses News API if key is set, otherwise shows demo news.)</small>
+</div>
+
+<!-- FOOTER -->
+<div class="foot">
+  © 2025 – No Copyright
+</div>
+
+</div>
+
+<script>
+// ========== DARK MODE ==========
+function toggleDark(){
+  document.body.classList.toggle("dark");
+}
+
+// ========== PAGE NAVIGATION ==========
+function showPage(id){
+  document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+// ========== LIVE NEWS ==========
+let news = [
+  "Exit polls show close contest in key states.",
+  "Voter turnout crosses 60% by 4 PM.",
+  "Security tightened across all sensitive booths.",
+  "Counting arrangements finalized by EC.",
+  "Special facilities arranged for differently-abled voters."
+];
+let newsIndex = 0;
+
+function updateNewsText(){
+  const t = document.getElementById("newsText");
+  const time = document.getElementById("newsTime");
+  if(!t || !time) return;
+  t.textContent = news[newsIndex % news.length];
+  time.textContent = "Last updated: " + new Date().toLocaleTimeString();
+  newsIndex++;
+}
+setInterval(updateNewsText, 5000);
+updateNewsText();
+
+// OPTIONAL REAL API NEWS (NewsData.io style)
+// 1. Get API key from https://newsdata.io (free tier).
+// 2. Replace "YOUR_API_KEY_HERE" below.
+const LIVE_NEWS_API_KEY = "YOUR_API_KEY_HERE"; // put your real key here
+const LIVE_NEWS_URL = LIVE_NEWS_API_KEY
+  ? `https://newsdata.io/api/1/latest?apikey=YOUR_API_KEY&q=elections'`
+  : null;
+
+async function fetchLiveNews(){
+  if(!LIVE_NEWS_URL){
+    console.log("No API key set, using local demo news.");
+    updateNewsText();
+    return;
+  }
+  try{
+    const res = await fetch(LIVE_NEWS_URL);
+    const data = await res.json();
+    if(data && data.results && data.results.length){
+      news = data.results.slice(0,5).map(n=>n.title);
+      newsIndex = 0;
+      updateNewsText();
+    }
+  }catch(err){
+    console.log("Live news API error, falling back to demo data:", err);
+    updateNewsText();
+  }
+}
+fetchLiveNews();
+
+// ========== CANDIDATES (localStorage = mini DB) ==========
+function addCandidate(){
+  const name = document.getElementById("cname").value.trim();
+  const party = document.getElementById("cparty").value.trim();
+  const consti = document.getElementById("cconst").value.trim();
+  if(!name || !party || !consti) return;
+
+  const data = JSON.parse(localStorage.getItem("cands") || "[]");
+  data.push({n:name,p:party,c:consti});
+  localStorage.setItem("cands", JSON.stringify(data));
+  document.getElementById("cname").value = "";
+  document.getElementById("cparty").value = "";
+  document.getElementById("cconst").value = "";
+  loadCandidates();
+}
+
+function loadCandidates(){
+    let data = JSON.parse(localStorage.getItem("cands") || "[]");
+candTable.innerHTML="<tr><th>Name</th><th>Party</th><th>Constituency</th><th>Action</th></tr>";
+
+
+    data.forEach((x, index) => {
+        candTable.innerHTML += `
+            <tr>
+                <td>${x.n}</td>
+                <td>${x.p}</td>
+                <td>${x.c}</td>
+                <td>
+                    <button onclick="deleteCandidate(${index})">❌ Delete</button>
+                </td>
+            </tr>
+        `;
+    });
+}
+function deleteCandidate(index){
+    let data = JSON.parse(localStorage.getItem("cands") || "[]");
+
+    if(confirm("Are you sure you want to delete this candidate?")){
+        data.splice(index, 1);   // remove that candidate
+        localStorage.setItem("cands", JSON.stringify(data));
+        loadCandidates();       // refresh table
+    }
+}
+
+
+
+// ========== MONITOR LIVE % ==========
+setInterval(()=>{
+  document.querySelectorAll(".vote").forEach(cell=>{
+    let val = parseInt(cell.textContent,10);
+    const inc = Math.floor(Math.random()*4); // 0–3
+    val = Math.min(100, val + inc);
+    cell.textContent = val;
+  });
+}, 5000);
+
+// ========== REPORT SYSTEM ==========
+function saveReport(){
+  const name = document.getElementById("rname").value.trim();
+  const booth = document.getElementById("rbooth").value.trim();
+  const type = document.getElementById("rtype").value;
+  const desc = document.getElementById("rdesc").value.trim();
+
+  const data = JSON.parse(localStorage.getItem("reports") || "[]");
+  data.push({n:name,b:booth,t:type,d:desc});
+  localStorage.setItem("reports", JSON.stringify(data));
+
+  document.getElementById("rname").value = "";
+  document.getElementById("rbooth").value = "";
+  document.getElementById("rdesc").value = "";
+  document.getElementById("rimage").value = "";
+  document.getElementById("reportPreview").style.display = "none";
+
+  loadReports();
+}
+
+function loadReports(){
+  const data = JSON.parse(localStorage.getItem("reports") || "[]");
+  const list = document.getElementById("reportList");
+  if(!list) return;
+  list.innerHTML = "";
+  data.forEach((r,i)=>{
+    list.innerHTML += `<li>${i+1}. Booth ${r.b} - [${r.t}] ${r.d}</li>`;
+  });
+}
+loadReports();
+
+// IMAGE PREVIEW (no real upload, just front-end preview)
+const imgInput = document.getElementById("rimage");
+if(imgInput){
+  imgInput.addEventListener("change", e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev=>{
+      const img = document.getElementById("reportPreview");
+      img.src = ev.target.result;
+      img.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// DOWNLOAD COMPLAINT REPORT (text file)
+function downloadReport(){
+  const data = JSON.parse(localStorage.getItem("reports") || "[]");
+  if(!data.length){
+    alert("No complaints to download.");
+    return;
+  }
+  let content = "Election Complaint Report\n\n";
+  data.forEach((r,i)=>{
+    content += `${i+1}. Booth: ${r.b}\nType: ${r.t}\nDesc: ${r.d}\nName: ${r.n}\n\n`;
+  });
+
+  const blob = new Blob([content], {type:"text/plain"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "complaints_report.txt"; // can rename to .pdf if you just want the name
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ========== ADMIN LOGIN ==========
+function login(){
+  const user = document.getElementById("auser").value.trim();
+  const pass = document.getElementById("apass").value.trim();
+  const msg = document.getElementById("loginMsg");
+  const dash = document.getElementById("adminDash");
+  if(user==="admin" && pass==="admin123"){
+    msg.textContent = "Login successful. Admin dashboard unlocked.";
+    msg.style.color = "lightgreen";
+    dash.style.display = "block";
+  }else{
+    msg.textContent = "Invalid username or password.";
+    msg.style.color = "red";
+    dash.style.display = "none";
+  }
+}
+
+// ========== RESULTS GRAPH ==========
+(function drawResultsGraph(){
+  const canvas = document.getElementById("chart");
+  if(!canvas) return;
+  const ctx = canvas.getContext("2d");
+
+  const labels = ["Delhi","Hyd","Mumbai"];
+  const values = [45200,50100,38900];
+  const maxVal = Math.max(...values);
+
+  const padding = 25;
+  const chartHeight = canvas.height - padding*2;
+  const chartWidth  = canvas.width  - padding*2;
+  const barWidth = chartWidth / values.length * 0.6;
+  const gap = chartWidth / values.length * 0.4;
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.font = "11px Segoe UI";
+
+  values.forEach((val,i)=>{
+    const x = padding + i*(barWidth+gap);
+    const barHeight = (val / maxVal) * chartHeight;
+    const y = canvas.height - padding - barHeight;
+
+    ctx.fillStyle = "#0077b6";
+    ctx.fillRect(x,y,barWidth,barHeight);
+
+    ctx.fillStyle = "#000";
+    ctx.fillText(labels[i], x, canvas.height - padding + 12);
+    ctx.fillText(val,    x, y-5);
+  });
+
+  ctx.beginPath();
+  ctx.moveTo(padding, canvas.height - padding);
+  ctx.lineTo(canvas.width-padding, canvas.height-padding);
+  ctx.stroke();
+})();
+</script>
+
+</body>
+</html>
